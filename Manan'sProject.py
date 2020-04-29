@@ -5,8 +5,8 @@ import sqlite3
 
 width,height="700","500"
 framecolor="green"
-notebookcolor = "red"
-framefg="white"
+notebookcolor = "purple"
+fg="white"
 fontsize=20
 
 
@@ -55,22 +55,22 @@ def loggedin():
 def insert(nb):
     f1=Frame(bg=notebookcolor)
     nb.add(f1,text="manan")
-    Label(f1, text="Enter Roll.No. ", bg=notebookcolor, font=("", 17)).place(x=60, y=50)
+    Label(f1, text="Enter Roll.No. ",fg=fg, bg=notebookcolor, font=("", 17)).place(x=60, y=50)
     entryrn = Entry ( f1 , font = ( "" , 15 ) , width = 18 , textvariable = studentrno )
     entryrn.place(x=300, y=50)
-    Label(f1, text="Enter Name", bg=notebookcolor, font=("", 17)).place(
+    Label(f1, text="Enter Name",fg=fg, bg=notebookcolor, font=("", 17)).place(
         x=60, y=100)
     entryname = Entry(f1, font=("", 15), width=18 , textvariable = studentn)
     entryname.place(x=300, y=100)
-    Label(f1, text="Physics Marks", bg=notebookcolor, font=("", 17)).place(
+    Label(f1, text="Physics Marks",fg=fg, bg=notebookcolor, font=("", 17)).place(
         x=60, y=150)
     entryphy = Entry(f1, font=("", 15), width=18 , textvariable = phymarks)
     entryphy.place(x=300, y=150)
-    Label(f1, text="Chemistry Marks", bg=notebookcolor, font=("", 17)).place(
+    Label(f1, text="Chemistry Marks",fg=fg, bg=notebookcolor, font=("", 17)).place(
         x=60, y=200)
     entrychem = Entry(f1, font=("", 15), width=18 , textvariable = chemarks)
     entrychem.place(x=300, y=200)
-    Label(f1, text="Mathematics Marks", bg=notebookcolor, font=("", 17)).place(
+    Label(f1, text="Mathematics Marks",fg=fg, bg=notebookcolor, font=("", 17)).place(
         x=60, y=250)
     entrymath = Entry(f1, font=("", 15), width=18 , textvariable = mathmarks)
     entrymath.place(x=300, y=250)
@@ -91,7 +91,7 @@ def insert(nb):
         mathmarks.set("")
         phymarks.set("")
         chemarks.set("")
-    Button(f1, text="Submit", font=("", 15), bg=notebookcolor,activebackground="blue"
+    Button(f1, text="Submit", font=("", 15),fg=fg, bg=notebookcolor,activebackground="blue"
            ,command=marksSubmit).place(x=int(width) / 3, y=int(height) / 2 + 100) 
 
 def search(nb):
@@ -165,12 +165,84 @@ def showall(f3):
         db.close()
 
 def update(nb):
-    f4=Frame(bg=notebookcolor  )
+    en=StringVar()
+    ep=StringVar()
+    ec=StringVar()
+    em=StringVar()
+    f4=Frame(bg=notebookcolor)
     nb.add(f4,text="Update")
+    Label(f4,text="Enter Roll. No.",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=80)
+    Entry(f4,textvariable=studentrno,font=("",11),justify="right").place(x=int(width)/2-50,y=85,width=150)
+    def searchdb():
+        try :
+            db=sqlite3.connect('projectdb.db')
+            cr=db.cursor()  
+            r1=cr.execute("select * from students where RNO='"+studentrno.get()+"'") 
+            print(r1)
+            for r in r1 :
+                en.set(r[1])
+                ep.set(r[2])
+                ec.set(r[3])
+                em.set(r[4]) 
+                Label(f4,text="Name is",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=200)
+                Label(f4,text="Physics marks",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=250)
+                Label(f4,text="Chemistry marks",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=300)
+                Label(f4,text="MAthematics marks",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=350) 
+                Entry(f4,textvariable=en,bg="white",fg="red",font=("",15)).place(x=int(width)/2+50,y=200)
+                Entry(f4,textvariable=ep,bg="white",fg="red",font=("",15)).place(x=int(width)/2+50,y=250)
+                Entry(f4,textvariable=ec,bg="white",fg="red",font=("",15)).place(x=int(width)/2+50,y=300)
+                Entry(f4,textvariable=em,bg="white",fg="red",font=("",15)).place(x=int(width)/2+50,y=350)
+                def updatedata():
+                    global f33
+                    try :   
+                        db=sqlite3.connect('projectdb.db')
+                        cr=db.cursor()
+                        cr.execute(
+                            "update students set NAME='"+en.get()+"',PHY='"+ep.get()+"',CHE='"+ec.get()+"',MATHS='"+em.get()+"' where RNO='"+studentrno.get()+"'")
+                        db.commit()
+                    finally :   
+                        db.close()
+                        print("updated")
+                        showall(f33)
+                Button(f4,text="Update",bg=notebookcolor,fg="white",command=updatedata,
+                    font=("",11)).place(x=int(width)/2-200,y=400) 
+                break
+            else:
+                Label(f4,bg=notebookcolor).place(x=0,y=150,width=700,height=350)
+            db.commit()
+        finally :   
+            db.close() 
+    Button(f4,text="Search",bg=notebookcolor,fg="white",command=searchdb,
+        font=("",11)).place(x=int(width)/2+120,y=80,width=150)   
+
 
 def delete(nb):
-    f5=Frame(bg=notebookcolor  )
+    s1=StringVar()
+    f5=Frame(bg=notebookcolor)
     nb.add(f5,text="Delete")
+    Label(f5,text="Enter Roll. No.",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=80)
+    Entry(f5,textvariable=s1,font=("",11),justify="right").place(x=int(width)/2-50,y=85,width=150)
+    def deletedata():
+        global f33
+        try :   
+            db=sqlite3.connect('projectdb.db')
+            cr=db.cursor()
+            r1=cr.execute("select * from students where RNO='"+s1.get()+"'")
+            for r in r1:
+                cr.execute("delete from students where RNO='"+s1.get()+"'")
+                messagebox.showinfo("Data Deleted",s1.get()+" roll numbered student's data deleted")
+                break
+            else:
+                messagebox.showinfo("Data not found",s1.get()+" roll numbered student's data not found")       
+            db.commit()
+        finally :   
+            db.close()
+            print("Deleted")
+        showall(f33)
+
+
+    Button(f5,text="Delete",bg=notebookcolor,fg="white",command=deletedata,
+        font=("",11)).place(x=int(width)/2+120,y=80,width=150)   
 
 
 def logout(nb):
@@ -264,59 +336,66 @@ def submit():
 
 
 def loginPage():
+    usern.set("")
+    userp.set("")
+    usercn.set("")
     loginpage=Frame(bg=framecolor)
     loginpage.place(x=0,y=0,width=width,height=height)
 
-    Label(loginpage,text="Enter Name ",bg=framecolor,font=("",20)).place(x=60,y=100)
-    Label(loginpage,text="Enter Password ", bg=framecolor, font=("", 20)).place(
+    Label(loginpage,text="Enter Name ",fg=fg,bg=framecolor,font=("",20)).place(x=60,y=100)
+    Label(loginpage,text="Enter Password ",fg=fg ,bg=framecolor, font=("", 20)).place(
         x=60, y=190)
-    entryname = Entry(loginpage,font=("", 20), width=18,textvariable=usern)
+    entryname = Entry(loginpage,font=("", 20),fg=framecolor, width=18,textvariable=usern)
     entryname.place(x=300, y=100)
-    entrypassword = Entry(loginpage,font=("", 20), width=18,show='*',textvariable=userp)
+    entrypassword = Entry(loginpage,font=("", 20),fg=framecolor, width=18,show='*',textvariable=userp)
     entrypassword.place(x=300, y=190)
-    Button(loginpage,text="LogIn",font=("",15),bg=framecolor,
+    Button(loginpage,text="LogIn",font=("",15),fg=fg,bg=framecolor,
            command=login).place(x=int(width)/3,y=int(height) / 2+50)
-    Button(loginpage,text="Back to Home",font=("",15),bg=framecolor,
+    Button(loginpage,text="Back to Home",font=("",15),fg=fg,bg=framecolor,
            command=home).place(x=0,y=int(height)-50)
-    Button(loginpage,text="Register",font=("",15),bg=framecolor,
+    Button(loginpage,text="Register",font=("",15),bg=framecolor,fg=fg,
            command=registerPage).place(x=int(width)-100,y=int(height)-50)
 
 
 def registerPage():
+    usern.set("")
+    userp.set("")
+    usercn.set("")
+
     framecolor = "green"
     registerpage = Frame(bg=framecolor)
     registerpage.place(x=0, y=0, width=width, height=height)
 
-    Label(registerpage,text="Enter Name ", bg=framecolor, font=("", 20)).place(
+    Label(registerpage,text="Enter Name ", fg=fg,bg=framecolor, font=("", 20)).place(
         x=60, y=80)
-    Label(registerpage,text="Enter Password ", bg=framecolor, font=("", 20)).place(
+    Label(registerpage,text="Enter Password ",fg=fg, bg=framecolor, font=("", 20)).place(
         x=60, y=170)
-    Label(registerpage,text="Enter Contact no. ", bg=framecolor, font=("", 20)).place(
+    Label(registerpage,text="Enter Contact no. ",fg=fg, bg=framecolor, font=("", 20)).place(
         x=60, y=260)
-    entryname = Entry(registerpage,font=("", 20), width=18,textvariable=usern)
+    entryname = Entry(registerpage,font=("", 20),fg=framecolor, width=18,textvariable=usern)
     entryname.place(x=300, y=80)
-    entrypassword = Entry(registerpage,font=("", 20), width=18,textvariable=userp)
+    entrypassword = Entry(registerpage,font=("", 20),fg=framecolor, width=18,textvariable=userp)
     entrypassword.place(x=300, y=170)
-    entrycontact = Entry(registerpage,font=("", 20), width=18,textvariable=usercn)
+    entrycontact = Entry(registerpage,font=("", 20),fg=framecolor, width=18,textvariable=usercn)
     entrycontact.place(x=300, y=260)
-    Button(registerpage,text="Submit", font=("", 15), bg=framecolor,
+    Button(registerpage,text="Submit", font=("", 15),fg=fg, bg=framecolor,
            command=submit).place(x=int(width) / 3, y=int(height) / 2+100)
-    Button(registerpage,text="Back to Home", font=("", 15), bg=framecolor,
+    Button(registerpage,text="Back to Home", font=("", 15),fg=fg, bg=framecolor,
            command=home).place(x=0, y=int(height) - 50)
-    Button(registerpage,text="Log in", font=("", 15), bg=framecolor,
+    Button(registerpage,text="Log in", font=("", 15),fg=fg ,bg=framecolor,
            command=loginPage).place(x=int(width) - 100, y=int(height) - 50)
 
 def home():
     homepage=Frame(bg=framecolor)
     homepage.place(x=0,y=0,width=width,height=height)
 
-    Label(text="HOME PAGE",font=("",40)).place(x=int(width)/4,y=int(height)/10)  
+    Label(text="HOME PAGE",font=("",40),bg="#009900",fg=fg).place(x=int(width)/4,y=int(height)/10)  
 
-    blg=Button(homepage,text="Log in",font=("",20),width=10,height=1,
+    blg=Button(homepage,text="Log in",font=("",20),fg=fg,bg=framecolor,width=10,height=1,
                command=loginPage)
     blg.place(x=int(width)/4-50,y=int(height)/2)
 
-    breg =Button(homepage,text="Register",font=("",20),width=10,height=1,
+    breg =Button(homepage,text="Register",font=("",20),fg=fg,bg=framecolor,width=10,height=1,
                  command=registerPage)
     breg.place(x=int(width)/2+50,y=int(height)/2)
 
