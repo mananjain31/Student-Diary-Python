@@ -26,12 +26,25 @@ chemarks = StringVar()
 mathmarks = StringVar()
 
 f33=None
+f22=None
 
 
 
 def loggedin(): 
     nb=ttk.Notebook()
     nb.place(x=0,y=0,width=width,height=height)
+    def tabchanged(a):
+        if nb.index('current') == 5 :
+            studentrno.set("") 
+            studentn.set("")  
+            phymarks.set("") 
+            chemarks.set("") 
+            mathmarks.set("")
+            home()
+        # if nb.index('current') == 1 :
+        #     global f22
+        #     Label(f22,bg=notebookcolor).place(x=0,y=150,width=700,height=350)
+    nb.bind("<<NotebookTabChanged>>",tabchanged)
     insert(nb)
     search(nb)
     showa(nb)
@@ -63,12 +76,14 @@ def insert(nb):
     entrymath.place(x=300, y=250)
     def marksSubmit():
         global f33
-        db=sqlite3.connect('projectdb.db')
-        cr=db.cursor()
-        cr.execute(
-            "insert into students(RNO,NAME,PHY,CHE,MATHS) VALUES('"+studentrno.get()+"','"+studentn.get()+"','"+phymarks.get()+"','"+chemarks.get()+"','"+mathmarks.get()+"')")
-        db.commit()
-        db.close()
+        try :   
+            db=sqlite3.connect('projectdb.db')
+            cr=db.cursor()
+            cr.execute(
+                "insert into students(RNO,NAME,PHY,CHE,MATHS) VALUES('"+studentrno.get()+"','"+studentn.get()+"','"+phymarks.get()+"','"+chemarks.get()+"','"+mathmarks.get()+"')")
+            db.commit()
+        finally :   
+            db.close()
         print("success")
         showall(f33)
         studentrno.set("")
@@ -80,13 +95,34 @@ def insert(nb):
            ,command=marksSubmit).place(x=int(width) / 3, y=int(height) / 2 + 100) 
 
 def search(nb):
+    global f22
+    s1=StringVar()
     f2=Frame(bg = notebookcolor )
     nb.add(f2,text="Search")
-    Label(f2,bg=notebookcolor).place(x=0,y=0,width=int(width),height=int(height))
+    f22=f2
     Label(f2,text="Enter Roll. No.",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=80)
-    Entry(f2,textvariable=studentrno,font=("",11),justify="right").place(x=int(width)/2-50,y=85,width=150) 
+    Entry(f2,textvariable=s1,font=("",11),justify="right").place(x=int(width)/2-50,y=85,width=150) 
     def searchdb():
-        pass
+        try :
+            db=sqlite3.connect('projectdb.db')
+            cr=db.cursor()  
+            r1=cr.execute("select * from students where RNO='"+s1.get()+"'") 
+            print(r1)
+            for r in r1 : 
+                Label(f2,text="Name is",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=200)
+                Label(f2,text="Physics marks",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=250)
+                Label(f2,text="Chemistry marks",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=300)
+                Label(f2,text="MAthematics marks",bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2-200,y=350) 
+                Label(f2,text=r[1],bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2+50,y=200)
+                Label(f2,text=r[2],bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2+50,y=250)
+                Label(f2,text=r[3],bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2+50,y=300)
+                Label(f2,text=r[4],bg=notebookcolor,fg="white",font=("",15)).place(x=int(width)/2+50,y=350)
+                break
+            else:
+                Label(f2,bg=notebookcolor).place(x=0,y=150,width=700,height=350)
+            db.commit()
+        finally :   
+            db.close()
     Button(f2,text="Search",bg=notebookcolor,fg="white",command=searchdb,
         font=("",11)).place(x=int(width)/2+120,y=80,width=150)   
 
@@ -104,27 +140,29 @@ def showall(f3):
     Label(f3,text="Physics ",bg=notebookcolor,fg="white",font=("",15)).place(x=300,y=10)
     Label(f3,text="Chemistry",bg=notebookcolor,fg="white",font=("",15)).place(x=420,y=10)
     Label(f3,text="Mathematics",bg=notebookcolor,fg="white",font=("",15)).place(x=540,y=10)
-    db=sqlite3.connect('projectdb.db')
-    cr=db.cursor()
-    r=cr.execute("select * from students")
-    x=30
-    y=40
-    for r1 in r:
-        if r1[0] =="" :
-            continue   
-        Label(f3,text=r1[0],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
-        x += 150
-        Label(f3,text=r1[1],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
-        x += 120
-        Label(f3,text=r1[2],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
-        x += 120
-        Label(f3,text=r1[3],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
-        x += 120
-        Label(f3,text=r1[4],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
-        x = 30
-        y+=20
-    db.commit()
-    db.close()
+    try :    
+        db=sqlite3.connect('projectdb.db')
+        cr=db.cursor()
+        r=cr.execute("select * from students")
+        x=30
+        y=40
+        for r1 in r:
+            if r1[0] =="" :
+                continue   
+            Label(f3,text=r1[0],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
+            x += 150
+            Label(f3,text=r1[1],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
+            x += 120
+            Label(f3,text=r1[2],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
+            x += 120
+            Label(f3,text=r1[3],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
+            x += 120
+            Label(f3,text=r1[4],font=("",11),bg=notebookcolor,fg="white").place(x=x,y=y)
+            x = 30
+            y+=20
+        db.commit()
+    finally :    
+        db.close()
 
 def update(nb):
     f4=Frame(bg=notebookcolor  )
@@ -143,19 +181,21 @@ def logout(nb):
    
 
 def login():
-    db = sqlite3.connect('projectdb.db')
-    cr = db.cursor()
-    got=cr.execute("select * from users where UNAME='"+usern.get()+"' AND UPASS='"+userp.get()+"'")
-    for i in got :
-        print(i)
-        loggedin()
-        usern2.set(usern.get())
-        messagebox.showinfo("Its My First Python Project", "WELCOME "+usern2.get()+" !!")
-        break
-    else:
-        messagebox.showinfo("Title","No such user found")
-    db.commit()
-    db.close()
+    try :
+        db = sqlite3.connect('projectdb.db')
+        cr = db.cursor()
+        got=cr.execute("select * from users where UNAME='"+usern.get()+"' AND UPASS='"+userp.get()+"'")
+        for i in got :
+            print(i)
+            loggedin()
+            usern2.set(usern.get())
+            messagebox.showinfo("Its My First Python Project", "WELCOME "+usern2.get()+" !!")
+            break
+        else:
+            messagebox.showinfo("Title","No such user found")
+        db.commit()
+    finally :
+        db.close()
     userp.set("")
     usern.set("")
     usercn.set("")
@@ -192,13 +232,15 @@ def testUserData():
 def submit():
     emsg=""
     if testUserData()==[True,True,True]:
-        db = sqlite3.connect('projectdb.db')
-        cr = db.cursor()
-       # cr.execute("create table users(UNAME text , UPASS text , UCN text)")
-        cr.execute(
-            "insert into users(UNAME , UPASS , UCN) VALUES('"+usern.get()+"','"+userp.get()+"','"+usercn.get()+"')")
-        db.commit()
-        db.close()
+        try :
+            db = sqlite3.connect('projectdb.db')
+            cr = db.cursor()
+           # cr.execute("create table users(UNAME text , UPASS text , UCN text)")
+            cr.execute(
+                "insert into users(UNAME , UPASS , UCN) VALUES('"+usern.get()+"','"+userp.get()+"','"+usercn.get()+"')")
+            db.commit()
+        finally:
+            db.close()
         print("User registered")
         messagebox.showinfo("Title", usern.get()+" succesfully Registered" )
         home()
@@ -279,6 +321,5 @@ def home():
     breg.place(x=int(width)/2+50,y=int(height)/2)
 
 home()
-
 
 t.mainloop()
