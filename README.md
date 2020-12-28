@@ -1,5 +1,5 @@
 # python-project1
-Project Name: Student's Marking Management  
+Project Name: Student's Marking Application  
 
 Description: 
 This is an desktop application providing "Login" and "Register" features for faculties.
