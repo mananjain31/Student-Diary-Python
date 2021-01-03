@@ -1,5 +1,4 @@
-# python-project1
-Project Name: Student's Marking Application  
+# Student-Diary-Python  
 
 Description: 
 This is an desktop application providing "Login" and "Register" features for faculties.
