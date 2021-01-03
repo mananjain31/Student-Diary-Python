@@ -1,4 +1,4 @@
-# Student-Diary-Python  
+# Student-Diary
 
 Description: 
 This is an desktop application providing "Login" and "Register" features for faculties.
