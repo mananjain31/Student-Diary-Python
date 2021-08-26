@@ -399,6 +399,19 @@ def home():
                  command=registerPage)
     breg.place(x=int(width)/2+50,y=int(height)/2)
 
+
+try :   
+    db=sqlite3.connect('projectdb.db')
+    cr=db.cursor()
+    cr.execute(
+        "CREATE TABLE IF NOT EXISTS students(RNO text , NAME text , PHY text , CHE text , MATHS text)")
+    db.commit()
+    cr.execute(
+        "CREATE TABLE IF NOT EXISTS users(UNAME text , UPASS text , UCN text)")
+    db.commit()
+finally :   
+    db.close()
+
 home()
 
 t.mainloop()
